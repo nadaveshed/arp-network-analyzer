@@ -110,11 +110,6 @@ class CLIController:
         json_path = exporter.export_json()
         logger.info(f"Final snapshot saved to: {json_path}")
         
-        # Generate visualization
-        visualizer = GraphVisualizer(self.graph)
-        html_path = visualizer.generate_html("snapshots/final_visualization.html")
-        logger.info(f"Visualization saved to: {html_path}")
-        
         # Print final stats
         stats = self.graph.get_stats()
         logger.info(f"Final stats: {stats}")

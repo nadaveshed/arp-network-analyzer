@@ -28,5 +28,4 @@ snapshots/*.html
 .DS_Store
 Thumbs.db
 
-# Summary (optional - remove if you want to commit it)
-SUMMARY_HE.md
+*.md

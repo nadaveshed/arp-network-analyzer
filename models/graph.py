@@ -1,6 +1,3 @@
-"""
-Network Graph Model - Thread-safe graph wrapper using NetworkX
-"""
 import threading
 from typing import Dict, List, Optional, Set
 import networkx as nx
@@ -21,12 +18,6 @@ class NetworkGraph:
         self.created_at = datetime.now()
     
     def add_or_update_node(self, node: NetworkNode) -> bool:
-        """
-        Add a new node or update existing one
-        
-        Returns:
-            True if node was newly created, False if updated
-        """
         with self.lock:
             node_id = node.get_id()
             is_new = node_id not in self.nodes
@@ -44,12 +35,6 @@ class NetworkGraph:
             return is_new
     
     def add_or_update_edge(self, connection: Connection) -> bool:
-        """
-        Add a new edge or update existing one
-        
-        Returns:
-            True if edge was newly created, False if updated
-        """
         with self.lock:
             edge_key = (connection.source_id, connection.target_id, connection.relationship_type)
             is_new = edge_key not in self.edges
