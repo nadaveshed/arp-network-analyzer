@@ -1,7 +1,3 @@
-"""
-Network Analyzer Service - Enriches graph with analytics and anomaly detection
-שירות ניתוח רשת - מעשיר את הגרף בניתוחים וזיהוי אנומליות
-"""
 import logging
 import networkx as nx
 from typing import Dict, List
@@ -14,59 +10,13 @@ logger = logging.getLogger(__name__)
 
 
 class NetworkAnalyzer:
-    """
-    Service for analyzing and enriching the network graph
-    שירות לניתוח והעשרה של גרף הרשת - מוסיף מטריקות, מזהה קהילות ואנומליות
-    """
-    
+   
     def __init__(self, graph: NetworkGraph):
-        """
-        אתחול שירות ניתוח הרשת
-        
-        מטרה: הכנת השירות לביצוע ניתוחים על הגרף
-        
-        קלט (Input):
-            graph: אובייקט NetworkGraph לניתוח
-        
-        פלט (Output): אין
-        
-        משתנים פנימיים:
-            - last_analysis: תוצאות הניתוח האחרון
-            - anomalies: רשימת אנומליות שזוהו
-        """
         self.graph = graph
         self.last_analysis = None
         self.anomalies: List[Dict] = []
     
     def analyze(self) -> Dict:
-        """
-        ביצוע ניתוח מקיף של הגרף
-        
-        מטרה: לחשב מטריקות, לזהות קהילות ואנומליות
-        
-        Perform comprehensive graph analysis
-        
-        קלט (Input): אין
-        
-        פלט (Output):
-            dict: מילון עם תוצאות הניתוח:
-                - timestamp: זמן הניתוח
-                - centrality: מטריקות centrality לכל צומת
-                - communities: קבוצות של צמתים קשורים
-                - anomalies: אנומליות שזוהו
-        
-        דוגמת פלט:
-            {
-                "timestamp": "2025-12-24T11:48:00",
-                "centrality": {"aa:bb:cc:dd:ee:ff": 0.75, ...},
-                "communities": [["node1", "node2"], ["node3", "node4"]],
-                "anomalies": [{"type": "high_activity", ...}]
-            }
-        
-        הערות:
-            - רץ כל 30 שניות בתהליך נפרד
-            - שומר תוצאות ב-last_analysis
-        """
         logger.info("Starting network analysis...")
         
         results = {
@@ -80,27 +30,6 @@ class NetworkAnalyzer:
         return results
     
     def _calculate_centrality(self) -> Dict[str, float]:
-        """
-        חישוב מטריקות centrality לצמתים
-        
-        מטרה: לזהות צמתים חשובים/מרכזיים ברשת (hub devices)
-        
-        Calculate node centrality metrics
-        
-        קלט (Input): אין
-        
-        פלט (Output):
-            dict: מיפוי של node ID לציון centrality (0.0-1.0)
-                 ציון גבוה = צומת מרכזי עם הרבה קשרים
-        
-        אלגוריתם:
-            - משתמש ב-degree centrality של NetworkX
-            - מעדכן את metadata של כל צומת עם הציון
-        
-        הערות:
-            - מחזיר {} אם אין צמתים בגרף
-            - תופס שגיאות ומחזיר {} במקרה של בעיה
-        """
         with self.graph.lock:
             if len(self.graph.graph.nodes) == 0:
                 return {}
@@ -123,27 +52,6 @@ class NetworkAnalyzer:
                 return {}
     
     def _detect_communities(self) -> List[List[str]]:
-        """
-        זיהוי קהילות/צבירים ברשת
-        
-        מטרה: למצוא קבוצות של מכשירים שמתקשרים הרבה ביניהם
-        
-        Detect communities/clusters in the network
-        
-        קלט (Input): אין
-        
-        פלט (Output):
-            list: רשימה של קהילות, כל קהילה היא רשימת node IDs
-                 דוגמה: [["node1", "node2"], ["node3", "node4", "node5"]]
-        
-        אלגוריתם:
-            - ממיר את הגרף המכוון לבלתי-מכוון
-            - משתמש ב-greedy modularity communities של NetworkX
-        
-        הערות:
-            - דורש לפחות 3 צמתים
-            - מחזיר [] אם פחות מ-3 צמתים או שגיאה
-        """
         with self.graph.lock:
             if len(self.graph.graph.nodes) < 3:
                 return []
@@ -162,47 +70,6 @@ class NetworkAnalyzer:
                 return []
     
     def _detect_anomalies(self) -> List[Dict]:
-        """
-        זיהוי דפוסים חריגים ברשת
-        
-        מטרה: למצוא התנהגויות חשודות כמו סורקים או פעילות יתר
-        
-        Detect unusual patterns in the network
-        
-        קלט (Input): אין
-        
-        פלט (Output):
-            list: רשימת אנומליות, כל אחת מילון עם:
-                - type: סוג האנומליה
-                - node_id: מזהה הצומת החשוד
-                - severity: רמת חומרה (low/medium/high)
-                - נתונים נוספים ספציפיים לסוג
-        
-        סוגי אנומליות:
-            1. high_activity: צומת עם פעילות גבוהה פי 5 מהממוצע
-            2. potential_scanner: צומת עם 90%+ בקשות יוצאות (>10 שכנים)
-        
-        דוגמת פלט:
-            [
-                {
-                    "type": "high_activity",
-                    "node_id": "aa:bb:cc:dd:ee:ff",
-                    "packet_count": 500,
-                    "average": 100,
-                    "severity": "medium"
-                },
-                {
-                    "type": "potential_scanner",
-                    "node_id": "11:22:33:44:55:66",
-                    "outgoing_ratio": 0.95,
-                    "severity": "high"
-                }
-            ]
-        
-        הערות:
-            - שומר את התוצאות ב-self.anomalies
-            - רץ רק אם config.ANOMALY_DETECTION = True
-        """
         anomalies = []
         
         with self.graph.lock:
@@ -241,26 +108,6 @@ class NetworkAnalyzer:
         return anomalies
     
     def update_confidence_scores(self):
-        """
-        עדכון ציוני אמון לכל הקשרים
-        
-        מטרה: לעדכן את ציוני האמון של כל הקשרים בגרף לפי דעיכת זמן
-        
-        Update confidence scores for all edges based on time decay
-        
-        קלט (Input): אין
-        
-        פלט (Output): אין
-        
-        תופעות לוואי:
-            - קורא ל-calculate_confidence() לכל קשר
-            - משתמש ב-config.CONFIDENCE_DECAY_RATE
-            - קשרים ישנים מקבלים ציון נמוך יותר
-        
-        הערות:
-            - רץ כל 30 שניות יחד עם analyze()
-            - חשוב לשמירת רלוונטיות הגרף
-        """
         edges = self.graph.get_all_edges()
         
         for edge in edges:
@@ -269,40 +116,6 @@ class NetworkAnalyzer:
         logger.debug(f"Updated confidence scores for {len(edges)} edges")
     
     def get_top_nodes(self, n: int = 10) -> List[Dict]:
-        """
-        קבלת N הצמתים הפעילים ביותר
-        
-        מטרה: לספק רשימה של הצמתים עם הכי הרבה פעילות
-        
-        Get top N most active nodes
-        
-        קלט (Input):
-            n: כמה צמתים להחזיר (ברירת מחדל: 10)
-        
-        פלט (Output):
-            list: רשימת מילונים, כל אחד מכיל:
-                - id: מזהה הצומת
-                - ip: כתובת IP
-                - mac: כתובת MAC
-                - packet_count: מספר חבילות
-                - centrality: ציון centrality
-        
-        דוגמת פלט:
-            [
-                {
-                    "id": "aa:bb:cc:dd:ee:ff",
-                    "ip": "192.168.1.1",
-                    "mac": "aa:bb:cc:dd:ee:ff",
-                    "packet_count": 500,
-                    "centrality": 0.85
-                },
-                ...
-            ]
-        
-        שימוש:
-            - מוצג ב-API endpoint /api/stats
-            - עוזר לזהות מכשירים חשובים ברשת
-        """
         nodes = self.graph.get_all_nodes()
         sorted_nodes = sorted(nodes, key=lambda x: x.packet_count, reverse=True)
         

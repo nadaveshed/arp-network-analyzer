@@ -1,7 +1,3 @@
-"""
-Graph Builder Service - Processes ARP packets and builds the network graph
-שירות בניית גרף - מעבד חבילות ARP ובונה את גרף הרשת
-"""
 import logging
 from typing import Optional
 
@@ -19,24 +15,13 @@ from utils.transformers import normalize_mac
 logger = logging.getLogger(__name__)
 
 
-class GraphBuilderService:
-    """
-    Service for building and maintaining the network graph from ARP packets
-    שירות לבניה ותחזוקה של גרף הרשת מחבילות ARP - הלב של המערכת
-    """
-    
+class GraphBuilderService:    
     def __init__(self, graph: NetworkGraph):
         self.graph = graph
         self.packets_processed = 0
         self.packets_rejected = 0
     
     def process_packet(self, packet):
-        """
-        Process a single ARP packet and update the graph
-        
-        Args:
-            packet: Scapy packet object
-        """
         # Extract ARP information
         arp_info = extract_arp_info(packet)
         if not arp_info:
@@ -81,15 +66,6 @@ class GraphBuilderService:
                         f"rejected {self.packets_rejected}")
     
     def _create_node(self, node_info: dict) -> Optional[NetworkNode]:
-        """
-        Create a NetworkNode from parsed info
-        
-        Args:
-            node_info: Dictionary with 'ip' and 'mac' keys
-        
-        Returns:
-            NetworkNode or None if insufficient info
-        """
         ip = node_info.get("ip")
         mac = node_info.get("mac")
         
@@ -107,17 +83,6 @@ class GraphBuilderService:
         target: NetworkNode,
         arp_type: str
     ) -> Connection:
-        """
-        Create a Connection between two nodes
-        
-        Args:
-            source: Source NetworkNode
-            target: Target NetworkNode
-            arp_type: "request" or "reply"
-        
-        Returns:
-            Connection object
-        """
         relationship_type = (
             Connection.ARP_REQUEST if arp_type == "request"
             else Connection.ARP_REPLY

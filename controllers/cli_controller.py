@@ -1,7 +1,3 @@
-"""
-CLI Controller - Command-line interface for the ARP analyzer
-בקר ממשק שורת פקודה - ניהול הממשק הטקסטואלי של מנתח ה-ARP
-"""
 import argparse
 import logging
 import signal
@@ -22,34 +18,17 @@ logger = logging.getLogger(__name__)
 
 
 class CLIController:
-    """
-    Command-line interface controller
-    בקר ממשק שורת פקודה - מתאם בין המשתמש לשירותי המערכת
-    """
     
     def __init__(self):
-        """
-        אתחול בקר CLI
-        מטרה: יצירת כל השירותים הנדרשים להרצת המערכת
-        """
-        self.graph = NetworkGraph()  # גרף הרשת המרכזי
-        self.capture_service = None  # שירות לכידת חבילות
-        self.graph_builder = None  # שירות בניית הגרף
-        self.analyzer = None  # שירות ניתוח הרשת
-        self.api_controller = None  # בקר API אופציונלי
-        self.running = False  # דגל ריצה
-        self.analysis_thread = None  # תהליך ניתוח מקבילי
+        self.graph = NetworkGraph()
+        self.capture_service = None
+        self.graph_builder = None
+        self.analyzer = None
+        self.api_controller = None
+        self.running = False
+        self.analysis_thread = None
     
     def run(self, args):
-        """
-        פונקציית ההרצה הראשית
-        מטרה: להפעיל את כל המערכת - לכידת חבילות, ניתוח, ו-API
-        
-        Main execution method
-        
-        Args:
-            args: ארגומנטים מעובדים משורת הפקודה
-        """
         # Setup logging
         logging.basicConfig(
             level=getattr(logging, args.log_level),
@@ -90,11 +69,6 @@ class CLIController:
             self._status_loop()
     
     def _periodic_analysis(self):
-        """
-        הרצת ניתוח תקופתי של הגרף
-        מטרה: לעדכן מטריקות ציון אמון וניתוחים כל 30 שניות
-        רץ בתהליך נפרד (thread) כדי לא לחסום את לכידת החבילות
-        """
         while self.running:
             time.sleep(config.ENRICHMENT_INTERVAL)
             if self.running:
@@ -105,10 +79,6 @@ class CLIController:
                     logger.error(f"Analysis error: {e}")
     
     def _status_loop(self):
-        """
-        הדפסת עדכוני סטטוס במצב CLI
-        מטרה: להציג למשתמש סטטיסטיקות כל 10 שניות כאשר רץ ללא ממשק ווב
-        """
         while self.running:
             time.sleep(10)
             if self.running:
@@ -124,18 +94,10 @@ class CLIController:
                 )
     
     def _signal_handler(self, signum, frame):
-        """
-        טיפול באותות כיבוי (Ctrl+C)
-        מטרה: לתפוס אותות SIGINT/SIGTERM ולבצע כיבוי מסודר
-        """
         logger.info("\nShutting down gracefully...")
         self.shutdown()
     
     def shutdown(self):
-        """
-        ביצוע כיבוי מסודר של המערכת
-        מטרה: לעצור לכידת חבילות, לייצא snapshot סופי, וליצור ויזואליזציה
-        """
         self.running = False
         
         # Stop packet capture
@@ -162,10 +124,6 @@ class CLIController:
 
 
 def main():
-    """
-    נקודת הכניסה הראשית לתוכנית
-    מטרה: לפרסר ארגומנטים משורת הפקודה ולהפעיל את הבקר
-    """
     parser = argparse.ArgumentParser(
         description="Passive ARP Network Analysis Tool"
     )

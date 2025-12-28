@@ -1,7 +1,3 @@
-"""
-Graph Visualization Service - Generate visual representations of the network graph
-שירות ויזואליזציה של גרף - יוצר ייצוגים ויזואליים של גרף הרשת
-"""
 import json
 import logging
 from typing import Dict, List
@@ -15,66 +11,16 @@ logger = logging.getLogger(__name__)
 
 
 class GraphVisualizer:
-    """
-    Service for generating graph visualizations
-    שירות ליצירת ויזואליזציות של הגרף - גרף אינטראקטיבי עם D3.js
-    """
     
     def __init__(self, graph: NetworkGraph):
-        """
-        אתחול שירות ויזואליזציה
-        
-        מטרה: הכנת השירות ליצירת ויזואליזציות אינטראקטיביות
-        
-        קלט (Input):
-            graph: אובייקט NetworkGraph לויזואליזציה
-        
-        פלט (Output): אין
-        """
+    
         self.graph = graph
     
     def generate_d3_data(self) -> Dict:
-        """
-        יצירת נתונים תואמי D3.js
-        
-        מטרה: להמיר את הגרף לפורמט JSON שמתאים ל-D3.js force-directed graph
-        
-        Generate D3.js compatible JSON data
-        
-        קלט (Input): אין
-        
-        פלט (Output):
-            dict: מילון עם שני מפתחות:
-                - nodes: מערך של צמתים עם תכונות ויזואליות
-                - links: מערך של קשרים בין צמתים
-        
-        תכונות Nodes:
-            - id: מזהה ייחודי
-            - label: תווית להצגה (IP או MAC)
-            - size: גודל הצומת (לפי packet_count)
-            - group: קבוצת פעילות (high/medium/low) - קובע צבע
-            - centrality: ציון חשיבות
-        
-        תכונות Links:
-            - source: מזהה צומת מקור
-            - target: מזהה צומת יעד
-            - type: סוג קשר (arp_request/arp_reply)
-            - width: עובי הקו (לפי confidence)
-            - confidence: ציון אמון
-        
-        שימוש:
-            - נשלח ל-API endpoint /api/d3
-            - משובץ ב-HTML visualization
-            - מתעדכן בזמן אמת
-        
-        הערות:
-            - גודל וצבע מחושבים אוטומטית
-            - תואם לפורמט D3.js v7
-        """
         nodes = []
         links = []
         
-        # Build nodes array - בניית מערך צמתים
+        # Build nodes array
         for node in self.graph.get_all_nodes():
             nodes.append({
                 "id": node.get_id(),
@@ -91,7 +37,7 @@ class GraphVisualizer:
                 "group": node.metadata.get("activity_level", "low")
             })
         
-        # Build links array - בניית מערך קשרים
+        # Build links array
         for edge in self.graph.get_all_edges():
             links.append({
                 "source": edge.source_id,
@@ -112,43 +58,6 @@ class GraphVisualizer:
         }
     
     def generate_html(self, output_path: str = "visualization.html") -> str:
-        """
-        יצירת קובץ HTML עצמאי עם ויזואליזציה
-        
-        מטרה: ליצור קובץ HTML שניתן לפתוח בדפדפן ולראות את הגרף
-        
-        Generate standalone HTML visualization
-        
-        קלט (Input):
-            output_path: נתיב לשמירת קובץ ה-HTML
-        
-        פלט (Output):
-            str: נתיב מלא לקובץ שנוצר
-        
-        תכונות הויזואליזציה:
-            - גרף force-directed אינטראקטיבי
-            - drag & drop של צמתים
-            - tooltips עם מידע מפורט
-            - צבעים לפי רמת פעילות
-            - גדלים לפי מספר חבילות
-            - עובי קווים לפי ציון אמון
-        
-        עיצוב:
-            - רקע כהה מודרני
-            - גרדיאנט סגול בכותרת
-            - סטטיסטיקות בזמן אמת
-            - מקרא (legend) לצבעים
-        
-        שימוש:
-            - נשמר אוטומטית בעת כיבוי
-            - נגיש דרך API: GET /
-            - ניתן לשתף עם אחרים
-        
-        הערות:
-            - כולל D3.js מ-CDN
-            - עובד ללא חיבור לשרת
-            - קובץ עצמאי אחד
-        """
         d3_data = self.generate_d3_data()
         stats = self.graph.get_stats()
         
@@ -161,25 +70,6 @@ class GraphVisualizer:
         return output_path
     
     def _get_html_template(self, data: Dict, stats: Dict) -> str:
-        """
-        יצירת תבנית HTML עם D3.js משובץ
-        
-        מטרה: ליצור את קוד ה-HTML המלא עם JavaScript לויזואליזציה
-        
-        Generate HTML template with embedded D3.js visualization
-        
-        קלט (Input):
-            data: נתוני D3 (nodes + links)
-            stats: סטטיסטיקות הגרף
-        
-        פלט (Output):
-            str: קוד HTML מלא מוכן לשמירה
-        
-        הערות:
-            - פונקציה פנימית - לא לקרוא ישירות
-            - משתמשת ב-f-string עם {} כפולים
-            - כוללת CSS ו-JavaScript משובצים
-        """
         return f"""<!DOCTYPE html>
 <html lang="en">
 <head>
