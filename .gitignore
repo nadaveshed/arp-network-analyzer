@@ -1,0 +1,32 @@
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Virtual environment
+venv/
+env/
+ENV/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Snapshots and exports
+snapshots/*.json
+snapshots/*.graphml
+snapshots/*.csv
+snapshots/*.html
+
+# Logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Summary (optional - remove if you want to commit it)
+SUMMARY_HE.md
